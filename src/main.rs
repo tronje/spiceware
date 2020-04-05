@@ -50,10 +50,10 @@ impl std::fmt::Display for Time {
             } else {
                 write!(f, "{} days, {} hours", self.days, self.hours)
             }
-        } else if self.years <= 2f64.powf(10.0) {
+        } else if self.years <= 10f64.powf(10.0) {
             write!(f, "{} years, {} days", self.years, self.days)
         } else {
-            write!(f, "2^{} years", self.years.log2().floor())
+            write!(f, "10^{} years", self.years.log10().floor())
         }
     }
 }
@@ -148,15 +148,15 @@ fn main() {
     }
 
     let possible_combintations = (WORDS.len() as f64).powf(args.num_words as f64);
-    let power_of_two = possible_combintations.log2().floor() as u64;
+    let power_of_ten = possible_combintations.log10().floor() as u64;
 
     println!("Your password is:");
     println!();
     println!("\t{}", password);
     println!();
     println!(
-        "This password is one of 2^{} possible combinations.",
-        power_of_two
+        "This password is one of 10^{} possible combinations.",
+        power_of_ten
     );
     println!();
 
