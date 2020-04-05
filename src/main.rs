@@ -160,7 +160,7 @@ fn main() {
     );
     println!();
 
-    println!("Assuming 1,000,000 guesses per second, the time it takes to guess your password is:");
+    println!("Assuming 1,000,000 guesses per second, the average time it takes to guess your password is:");
     let time = time_to_guess(1_000_000f64, possible_combintations);
     println!(
         "\t{} if the attacker knows the scheme used to generate your password",
