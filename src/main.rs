@@ -104,15 +104,15 @@ fn gen_passphrase(n: usize) -> String {
     (0..n).map(|_| get_word()).collect::<Vec<&str>>().join(" ")
 }
 
-/// Compute the rounded-down time to guess one of `possible_combintations` when performing
+/// Compute the rounded-down time to guess one of `possible_combinations` when performing
 /// `guesses_per_s` guesses per second.
 ///
 /// The assumption here is that half of all combinations need to be generated on average to arrive
 /// at the correct combination.
-fn time_to_guess(guesses_per_s: f64, possible_combintations: f64) -> Time {
+fn time_to_guess(guesses_per_s: f64, possible_combinations: f64) -> Time {
     // divide by two to get average guess time instead of the time to visit all possible
     // combinations
-    let seconds_to_guess = possible_combintations / guesses_per_s / 2.0;
+    let seconds_to_guess = possible_combinations / guesses_per_s / 2.0;
     let minutes = seconds_to_guess / 60.0;
     let hours = minutes / 60.0;
     let days = hours / 24.0;
@@ -147,8 +147,8 @@ fn main() {
         return;
     }
 
-    let possible_combintations = (WORDS.len() as f64).powf(args.num_words as f64);
-    let power_of_ten = possible_combintations.log10().floor() as u64;
+    let possible_combinations = (WORDS.len() as f64).powf(args.num_words as f64);
+    let power_of_ten = possible_combinations.log10().floor() as u64;
 
     println!("Your password is:");
     println!();
@@ -161,7 +161,7 @@ fn main() {
     println!();
 
     println!("Assuming 1,000,000 guesses per second, the average time it takes to guess your password is:");
-    let time = time_to_guess(1_000_000f64, possible_combintations);
+    let time = time_to_guess(1_000_000f64, possible_combinations);
     println!(
         "\t{} if the attacker knows the scheme used to generate your password",
         time
@@ -171,8 +171,8 @@ fn main() {
     // in any given password: 26 lower-case letters + 26 upper-case letters + 10 digits
     // this is quite generous, of course, because it doesn't include special characters like
     // punctuation, etc.
-    let possible_combintations = 62f64.powf(password.len() as f64);
-    let time = time_to_guess(1_000_000f64, possible_combintations);
+    let possible_combinations = 62f64.powf(password.len() as f64);
+    let time = time_to_guess(1_000_000f64, possible_combinations);
     println!("\t{} if the attacker does not know the scheme", time);
 }
 
@@ -228,16 +228,16 @@ mod tests {
     fn test_time_to_guess() {
         let guesses_per_s = 1_000.0;
 
-        let possible_combintations = 2.0 * 60.0 * 60.0 * guesses_per_s;
-        let t = time_to_guess(guesses_per_s, possible_combintations);
+        let possible_combinations = 2.0 * 60.0 * 60.0 * guesses_per_s;
+        let t = time_to_guess(guesses_per_s, possible_combinations);
         assert_eq!(t.hours as u32, 1);
 
-        let possible_combintations = 24.0 * possible_combintations;
-        let t = time_to_guess(guesses_per_s, possible_combintations);
+        let possible_combinations = 24.0 * possible_combinations;
+        let t = time_to_guess(guesses_per_s, possible_combinations);
         assert_eq!(t.days as u32, 1);
 
-        let possible_combintations = 365.2425 * possible_combintations;
-        let t = time_to_guess(guesses_per_s, possible_combintations);
+        let possible_combinations = 365.2425 * possible_combinations;
+        let t = time_to_guess(guesses_per_s, possible_combinations);
         assert_eq!(t.years as u32, 1);
     }
 }
