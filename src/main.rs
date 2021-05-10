@@ -1,9 +1,6 @@
-#[macro_use]
-extern crate clap;
-extern crate rand;
-
 mod words;
 
+use clap::Clap;
 use words::WORDS;
 
 /// Generate diceware-like passphrases
@@ -12,7 +9,7 @@ use words::WORDS;
 struct Arguments {
     /// The number of words a passphrase shall be made up of
     #[clap(
-        short = "w",
+        short = 'w',
         long = "words",
         value_name = "n",
         required = false,
@@ -22,7 +19,7 @@ struct Arguments {
 
     /// The number of passphrases to generate
     #[clap(
-        short = "n",
+        short = 'n',
         long = "passphrases",
         value_name = "n",
         required = false,
@@ -31,7 +28,7 @@ struct Arguments {
     num_passwords: usize,
 
     /// Print nothing but the passphrase (implied when -n is used)
-    #[clap(short = "q", long = "quiet")]
+    #[clap(short = 'q', long = "quiet")]
     quiet: bool,
 }
 
