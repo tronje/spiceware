@@ -27,6 +27,9 @@ struct Arguments {
     )]
     num_passwords: usize,
 
+    #[clap(short = 'd', long = "delimiter", default_value = " ")]
+    delimiter: String,
+
     /// Print nothing but the passphrase (implied when -n is used)
     #[clap(short = 'q', long = "quiet")]
     quiet: bool,
@@ -97,8 +100,11 @@ fn get_word<'a>() -> &'a str {
 }
 
 /// Generate a passphrase made up of `n` words
-fn gen_passphrase(n: usize) -> String {
-    (0..n).map(|_| get_word()).collect::<Vec<&str>>().join(" ")
+fn gen_passphrase(n: usize, delimiter: &str) -> String {
+    (0..n)
+        .map(|_| get_word())
+        .collect::<Vec<&str>>()
+        .join(delimiter)
 }
 
 /// Compute the rounded-down time to guess one of `possible_combinations` when performing
@@ -131,13 +137,13 @@ fn main() {
 
     if args.num_passwords > 1 {
         for _ in 0..args.num_passwords {
-            println!("{}", gen_passphrase(args.num_words));
+            println!("{}", gen_passphrase(args.num_words, &args.delimiter));
         }
 
         return;
     }
 
-    let password = gen_passphrase(args.num_words);
+    let password = gen_passphrase(args.num_words, &args.delimiter);
 
     if args.quiet {
         println!("{}", password);
@@ -216,7 +222,7 @@ mod tests {
     #[test]
     fn test_gen_passphrase() {
         for n in 1..50 {
-            let pw = gen_passphrase(n);
+            let pw = gen_passphrase(n, " ");
             assert!(pw.split(' ').collect::<Vec<_>>().len() == n);
         }
     }
