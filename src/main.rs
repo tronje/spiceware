@@ -35,29 +35,6 @@ struct Arguments {
     quiet: bool,
 }
 
-/// A primitive time type that has hour-resolution
-struct Time {
-    years: f64,
-    days: f64,
-    hours: f64,
-}
-
-impl std::fmt::Display for Time {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.years < 0.1 {
-            if self.days < 0.1 {
-                write!(f, "{} hours", self.hours)
-            } else {
-                write!(f, "{} days, {} hours", self.days, self.hours)
-            }
-        } else if self.years <= 10f64.powf(10.0) {
-            write!(f, "{} years, {} days", self.years, self.days)
-        } else {
-            write!(f, "10^{} years", self.years.log10().floor())
-        }
-    }
-}
-
 /// Roll `n` dice and collect the results into a vector.
 fn roll_dice(n: usize) -> Vec<u8> {
     use rand::distributions::Standard;
@@ -107,31 +84,6 @@ fn gen_passphrase(n: usize, delimiter: &str) -> String {
         .join(delimiter)
 }
 
-/// Compute the rounded-down time to guess one of `possible_combinations` when performing
-/// `guesses_per_s` guesses per second.
-///
-/// The assumption here is that half of all combinations need to be generated on average to arrive
-/// at the correct combination.
-fn time_to_guess(guesses_per_s: f64, possible_combinations: f64) -> Time {
-    // divide by two to get average guess time instead of the time to visit all possible
-    // combinations
-    let seconds_to_guess = possible_combinations / guesses_per_s / 2.0;
-    let minutes = seconds_to_guess / 60.0;
-    let hours = minutes / 60.0;
-    let days = hours / 24.0;
-
-    let years = days / 365.2425;
-
-    let remaining_days = days % 365.2425;
-    let remaining_hours = hours % 24.0;
-
-    Time {
-        years: years.floor(),
-        days: remaining_days.floor(),
-        hours: remaining_hours.floor(),
-    }
-}
-
 fn main() {
     let args = Arguments::parse();
 
@@ -158,25 +110,9 @@ fn main() {
     println!("\t{}", password);
     println!();
     println!(
-        "This password is one of 10^{} possible combinations.",
+        "This password is one of about 10^{} possible combinations.",
         power_of_ten
     );
-    println!();
-
-    println!("Assuming 1,000,000 guesses per second, the average time it takes to guess your password is:");
-    let time = time_to_guess(1_000_000f64, possible_combinations);
-    println!(
-        "\t{} if the attacker knows the scheme used to generate your password",
-        time
-    );
-
-    // the magic number `62` is derived from the assumption that there are 62 possible characters
-    // in any given password: 26 lower-case letters + 26 upper-case letters + 10 digits
-    // this is quite generous, of course, because it doesn't include special characters like
-    // punctuation, etc.
-    let possible_combinations = 62f64.powf(password.len() as f64);
-    let time = time_to_guess(1_000_000f64, possible_combinations);
-    println!("\t{} if the attacker does not know the scheme", time);
 }
 
 #[cfg(test)]
@@ -225,22 +161,5 @@ mod tests {
             let pw = gen_passphrase(n, " ");
             assert!(pw.split(' ').collect::<Vec<_>>().len() == n);
         }
-    }
-
-    #[test]
-    fn test_time_to_guess() {
-        let guesses_per_s = 1_000.0;
-
-        let possible_combinations = 2.0 * 60.0 * 60.0 * guesses_per_s;
-        let t = time_to_guess(guesses_per_s, possible_combinations);
-        assert_eq!(t.hours as u32, 1);
-
-        let possible_combinations = 24.0 * possible_combinations;
-        let t = time_to_guess(guesses_per_s, possible_combinations);
-        assert_eq!(t.days as u32, 1);
-
-        let possible_combinations = 365.2425 * possible_combinations;
-        let t = time_to_guess(guesses_per_s, possible_combinations);
-        assert_eq!(t.years as u32, 1);
     }
 }
