@@ -1,6 +1,6 @@
 [package]
 name = "spiceware"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Tronje Krabbe <hi@tron.je>"]
 edition = "2021"
 
