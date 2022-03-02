@@ -1,10 +1,10 @@
 mod words;
 
-use clap::Clap;
+use clap::Parser;
 use words::WORDS;
 
 /// Generate diceware-like passphrases
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(version = "0.1.0")]
 struct Arguments {
     /// The number of words a passphrase shall be made up of
