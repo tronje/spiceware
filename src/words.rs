@@ -1,3 +1,16 @@
+use rand::Rng;
+
+/// Get a random word from the word list.
+pub fn get_word<'a>() -> &'a str {
+    let mut rng = rand::thread_rng();
+    let index = rng.gen_range(0..WORDS.len());
+    WORDS[index]
+}
+
+pub fn possible_combinations(num_words: f64) -> f64 {
+    (WORDS.len() as f64).powf(num_words)
+}
+
 /// The EFF's large wordlist from here:
 ///   https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
 pub static WORDS: [&'static str; 7776] = [
