@@ -8,7 +8,7 @@ use words::WORDS;
 
 /// Generate diceware-like passphrases
 #[derive(Parser)]
-#[clap(version = "1.0.0")]
+#[command(version)]
 struct Spiceware {
     /// The number of words a passphrase shall be made up of
     #[clap(
