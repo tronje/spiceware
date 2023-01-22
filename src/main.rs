@@ -2,11 +2,14 @@ mod short_words;
 mod words;
 
 use clap::Parser;
+use rand::Rng;
+use short_words::SHORT_WORDS;
+use words::WORDS;
 
 /// Generate diceware-like passphrases
 #[derive(Parser)]
 #[clap(version = "1.0.0")]
-struct Arguments {
+struct Spiceware {
     /// The number of words a passphrase shall be made up of
     #[clap(
         short = 'w',
@@ -39,55 +42,67 @@ struct Arguments {
     short: bool,
 }
 
-/// Generate a passphrase made up of `n` words
-fn gen_passphrase(n: usize, delimiter: &str, short: bool) -> String {
-    (0..n)
-        .map(|_| {
-            if short {
-                short_words::get_word()
-            } else {
-                words::get_word()
-            }
-        })
-        .collect::<Vec<&str>>()
-        .join(delimiter)
+impl Spiceware {
+    fn main(self) {
+        if self.num_passwords > 1 || self.quiet {
+            self.batch_mode();
+        } else {
+            self.verbose_mode();
+        }
+    }
+
+    fn batch_mode(self) {
+        for _ in 0..self.num_passwords {
+            let passphrase = self.gen_passphrase();
+            println!("{}", passphrase);
+        }
+    }
+
+    fn verbose_mode(self) {
+        let possible_combinations = self.possible_combinations();
+        let power_of_ten = possible_combinations.log10().floor() as u64;
+
+        let passphrase = self.gen_passphrase();
+        println!("Your password is:");
+        println!();
+        println!("\t{}", passphrase);
+        println!();
+        println!(
+            "This password is one of about 10^{} possible combinations.",
+            power_of_ten
+        );
+    }
+
+    fn wordlist(&self) -> &[&str] {
+        if self.short {
+            &SHORT_WORDS
+        } else {
+            &WORDS
+        }
+    }
+
+    fn get_word(&self) -> &str {
+        let mut rng = rand::thread_rng();
+        let wordlist = self.wordlist();
+        let index = rng.gen_range(0..wordlist.len());
+        wordlist[index]
+    }
+
+    fn possible_combinations(&self) -> f64 {
+        let wordlist = self.wordlist();
+        let num_words = self.num_words as f64;
+        (wordlist.len() as f64).powf(num_words)
+    }
+
+    fn gen_passphrase(&self) -> String {
+        (0..self.num_words)
+            .map(|_| self.get_word())
+            .collect::<Vec<&str>>()
+            .join(&self.delimiter)
+    }
 }
 
 fn main() {
-    let args = Arguments::parse();
-
-    if args.num_passwords > 1 {
-        for _ in 0..args.num_passwords {
-            println!(
-                "{}",
-                gen_passphrase(args.num_words, &args.delimiter, args.short)
-            );
-        }
-
-        return;
-    }
-
-    let password = gen_passphrase(args.num_words, &args.delimiter, args.short);
-
-    if args.quiet {
-        println!("{}", password);
-        return;
-    }
-
-    let possible_combinations = if args.short {
-        short_words::possible_combinations(args.num_words as f64)
-    } else {
-        words::possible_combinations(args.num_words as f64)
-    };
-
-    let power_of_ten = possible_combinations.log10().floor() as u64;
-
-    println!("Your password is:");
-    println!();
-    println!("\t{}", password);
-    println!();
-    println!(
-        "This password is one of about 10^{} possible combinations.",
-        power_of_ten
-    );
+    let args = Spiceware::parse();
+    args.main();
 }
