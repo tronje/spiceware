@@ -18,7 +18,7 @@ struct Spiceware {
         required = false,
         default_value = "4"
     )]
-    num_words: usize,
+    num_words: u32,
 
     /// The number of passphrases to generate
     #[clap(
@@ -28,7 +28,7 @@ struct Spiceware {
         required = false,
         default_value = "1"
     )]
-    num_passwords: usize,
+    num_passwords: u32,
 
     #[clap(short = 'd', long = "delimiter", default_value = " ")]
     delimiter: String,
@@ -59,18 +59,11 @@ impl Spiceware {
     }
 
     fn verbose_mode(self) {
-        let possible_combinations = self.possible_combinations();
-        let power_of_ten = possible_combinations.log10().floor() as u64;
-
+        let power_of_ten = self.possible_combinations().ilog10();
         let passphrase = self.gen_passphrase();
-        println!("Your password is:");
-        println!();
-        println!("\t{}", passphrase);
-        println!();
-        println!(
-            "This password is one of about 10^{} possible combinations.",
-            power_of_ten
-        );
+        println!("Your password is:\n");
+        println!("\t{}\n", passphrase);
+        println!("This password is one of about 10^{power_of_ten} possible combinations.");
     }
 
     fn wordlist(&self) -> &[&str] {
@@ -88,10 +81,8 @@ impl Spiceware {
         wordlist[index]
     }
 
-    fn possible_combinations(&self) -> f64 {
-        let wordlist = self.wordlist();
-        let num_words = self.num_words as f64;
-        (wordlist.len() as f64).powf(num_words)
+    fn possible_combinations(&self) -> usize {
+        self.wordlist().len().pow(self.num_words)
     }
 
     fn gen_passphrase(&self) -> String {
