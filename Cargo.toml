@@ -3,6 +3,7 @@ name = "spiceware"
 version = "1.1.0"
 authors = ["Tronje Krabbe <hi@tron.je>"]
 edition = "2021"
+license = "0BSD"
 
 [dependencies]
 rand = "0.8.5"
