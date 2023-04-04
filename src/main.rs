@@ -74,15 +74,15 @@ impl Spiceware {
         }
     }
 
+    fn possible_combinations(&self) -> usize {
+        self.wordlist().len().pow(self.num_words)
+    }
+
     fn get_word(&self) -> &str {
         let mut rng = rand::thread_rng();
         let wordlist = self.wordlist();
         let index = rng.gen_range(0..wordlist.len());
         wordlist[index]
-    }
-
-    fn possible_combinations(&self) -> usize {
-        self.wordlist().len().pow(self.num_words)
     }
 
     fn gen_passphrase(&self) -> String {
