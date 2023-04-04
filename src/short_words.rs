@@ -1,6 +1,6 @@
 /// The EFF's short word list taken from here:
 ///   https://www.eff.org/files/2016/09/08/eff_short_wordlist_1.txt
-pub static SHORT_WORDS: [&'static str; 1296] = [
+pub static SHORT_WORDS: [&str; 1296] = [
     "acid", "acorn", "acre", "acts", "afar", "affix", "aged", "agent", "agile", "aging", "agony",
     "ahead", "aide", "aids", "aim", "ajar", "alarm", "alias", "alibi", "alien", "alike", "alive",
     "aloe", "aloft", "aloha", "alone", "amend", "amino", "ample", "amuse", "angel", "anger",
