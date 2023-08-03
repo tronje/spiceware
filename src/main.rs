@@ -59,11 +59,18 @@ impl Spiceware {
     }
 
     fn verbose_mode(self) {
-        let power_of_ten = self.possible_combinations().ilog10();
+        let (power_of_ten, overflowed) = match self.possible_combinations() {
+            Some(combs) => (combs.ilog10(), false),
+            None => (usize::MAX.ilog10(), true),
+        };
+
         let passphrase = self.gen_passphrase();
+
+        let qualifier = if overflowed { "over" } else { "about" };
+
         println!("Your password is:\n");
         println!("\t{}\n", passphrase);
-        println!("This password is one of about 10^{power_of_ten} possible combinations.");
+        println!("This password is one of {qualifier} 10^{power_of_ten} possible combinations.");
     }
 
     fn wordlist(&self) -> &[&str] {
@@ -85,8 +92,8 @@ impl Spiceware {
         self.num_words as usize * word_size + delimiter_size
     }
 
-    fn possible_combinations(&self) -> usize {
-        self.wordlist().len().pow(self.num_words)
+    fn possible_combinations(&self) -> Option<usize> {
+        self.wordlist().len().checked_pow(self.num_words)
     }
 
     fn get_word(&self) -> &str {
