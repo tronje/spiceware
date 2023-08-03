@@ -74,6 +74,17 @@ impl Spiceware {
         }
     }
 
+    fn worst_case_passphrase_size(&self) -> usize {
+        let word_size = if self.short {
+            short_words::MAX_SIZE
+        } else {
+            words::MAX_SIZE
+        };
+
+        let delimiter_size = self.delimiter.len() * (self.num_words as usize - 1);
+        self.num_words as usize * word_size + delimiter_size
+    }
+
     fn possible_combinations(&self) -> usize {
         self.wordlist().len().pow(self.num_words)
     }
@@ -86,10 +97,15 @@ impl Spiceware {
     }
 
     fn gen_passphrase(&self) -> String {
-        (0..self.num_words)
-            .map(|_| self.get_word())
-            .collect::<Vec<&str>>()
-            .join(&self.delimiter)
+        let mut passphrase = String::with_capacity(self.worst_case_passphrase_size());
+        for _ in 0..self.num_words - 1 {
+            passphrase.push_str(self.get_word());
+            passphrase.push_str(&self.delimiter);
+        }
+
+        passphrase.push_str(self.get_word());
+
+        passphrase
     }
 }
 

@@ -1,3 +1,6 @@
+/// Size, in bytes, of the largest word in this collection.
+pub static MAX_SIZE: usize = 5;
+
 /// The EFF's short word list taken from here:
 ///   https://www.eff.org/files/2016/09/08/eff_short_wordlist_1.txt
 pub static SHORT_WORDS: [&str; 1296] = [

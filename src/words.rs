@@ -1,3 +1,6 @@
+/// Size, in bytes, of the largest word in this collection.
+pub static MAX_SIZE: usize = 9;
+
 /// The EFF's large wordlist from here:
 ///   https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
 pub static WORDS: [&str; 7776] = [
